@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>RP Server Documentation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+header {
+  background: #020617;
+  padding: 30px;
+  text-align: center;
+  border-bottom: 3px solid #2563eb;
+}
+header img {
+  max-width: 260px;
+  border-radius: 50%;
+}
+header h1 {
+  margin: 15px 0 5px;
+  color: #facc15;
+}
+header p {
+  color: #94a3b8;
+}
+nav {
+  background: #020617;
+  padding: 12px;
+  text-align: center;
+}
+nav a {
+  color: #93c5fd;
+  margin: 0 15px;
+  text-decoration: none;
+  font-weight: bold;
+}
+.lang {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.lang button {
+  margin-left: 5px;
+}
+section {
+  max-width: 1000px;
+  margin: auto;
+  padding: 40px 20px;
+}
+h2 {
+  color: #38bdf8;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 5px;
+}
+.box {
+  background: #020617;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #2563eb;
+  border-radius: 8px;
+}
+.admin {
+  border-left-color: #dc2626;
+  background: #1e293b;
+}
+input {
+  padding: 10px;
+  width: 220px;
+}
+button {
+  padding: 10px 20px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+footer {
+  background: #020617;
+  padding: 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+</style>
+
+<script>
+/* ===== JAZYKY ===== */
+const text = {
+  cz: {
+    title: "RP Dokumentace Serveru",
+    subtitle: "Ekonomika • Doklady • Pravidla",
+    economy: "Ekonomika",
+    economyText: "Server používá Kuro’s Economy. PayDay každých 20 minut, práce, obchody, ATM.",
+    docs: "Doklady",
+    docsText: "ID, víza, pracovní povolení, zbrojní průkazy.",
+    weapons: "Zbrojní průkaz",
+    weaponsText: "Typ A – Policie, Typ B – Armáda, Typ C – Civilní, Typ D – Ochranka.",
+    admin: "Admin sekce",
+    adminLogin: "Zadej admin heslo",
+    adminInfo: "Admin informace"
+  },
+  en: {
+    title: "RP Server Documentation",
+    subtitle: "Economy • Documents • Rules",
+    economy: "Economy",
+    economyText: "Server uses Kuro’s Economy. PayDay every 20 minutes, jobs, shops, ATM.",
+    docs: "Documents",
+    docsText: "ID cards, visas, work permits, gun licenses.",
+    weapons: "Gun License",
+    weaponsText: "Type A – Police, Type B – Army, Type C – Civilian, Type D – Security.",
+    admin: "Admin section",
+    adminLogin: "Enter admin password",
+    adminInfo: "Admin information"
+  }
+};
+
+function setLang(l) {
+  document.getElementById("title").innerText = text[l].title;
+  document.getElementById("subtitle").innerText = text[l].subtitle;
+  document.getElementById("ecoTitle").innerText = text[l].economy;
+  document.getElementById("ecoText").innerText = text[l].economyText;
+  document.getElementById("docTitle").innerText = text[l].docs;
+  document.getElementById("docText").innerText = text[l].docsText;
+  document.getElementById("wepTitle").innerText = text[l].weapons;
+  document.getElementById("wepText").innerText = text[l].weaponsText;
+  document.getElementById("adminTitle").innerText = text[l].admin;
+  document.getElementById("adminLabel").innerText = text[l].adminLogin;
+}
+
+/* ===== HASH OCHRANA ===== */
+// SHA-256 hash hesla "ADMINOP"
+const ADMIN_HASH = "5f78c3322f0cbb6f56bfa6f64cfd4b0cfdac3c6c69a6c8d4b0a2a5b0b1a7c5e2";
+
+async function hash(text) {
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function unlockAdmin() {
+  const input = document.getElementById("adminPass").value;
+  const hashed = await hash(input);
+  if (hashed === ADMIN_HASH) {
+    document.getElementById("adminContent").style.display = "block";
+    document.getElementById("adminLogin").style.display = "none";
+  } else {
+    alert("Špatné heslo!");
+  }
+}
+</script>
+</head>
+
+<body onload="setLang('cz')">
+
+<div class="lang">
+  <button onclick="setLang('cz')">🇨🇿</button>
+  <button onclick="setLang('en')">🇬🇧</button>
+</div>
+
+<header>
+  <img src="logo.png">
+  <h1 id="title"></h1>
+  <p id="subtitle"></p>
+</header>
+
+<section>
+  <h2 id="ecoTitle"></h2>
+  <div class="box" id="ecoText"></div>
+
+  <h2 id="docTitle"></h2>
+  <div class="box" id="docText"></div>
+
+  <h2 id="wepTitle"></h2>
+  <div class="box" id="wepText"></div>
+
+  <h2 id="adminTitle"></h2>
+  <div id="adminLogin" class="box">
+    <p id="adminLabel"></p>
+    <input type="password" id="adminPass">
+    <button onclick="unlockAdmin()">Login</button>
+  </div>
+
+  <div id="adminContent" class="box admin" style="display:none;">
+    <ul>
+      <li>Prezidentská pokladna ≠ osobní účet</li>
+      <li>Zbrojní průkazy evidovat</li>
+      <li>Padělání = těžký RP zločin</li>
+      <li>PayDay nezkracovat</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  RP Server • Documentation
+</footer>
+
+</body>
+</html>
